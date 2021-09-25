@@ -21,7 +21,7 @@ func RootHandler(w http.ResponseWriter, r *http.Request, f func(http.ResponseWri
 	w.Header().Set("version", os.Getenv("VERSION"))
 	f(w, r)
 	code := reflect.ValueOf(w).Elem().FieldByName("status")
-	logrus.Infof("ip: %s, http code: %d", r.RemoteAddr, code)
+	logrus.Info("ip: ", r.RemoteAddr, ", http code: ", code)
 }
 
 func HealthHandler(w http.ResponseWriter, r *http.Request) {
@@ -29,11 +29,11 @@ func HealthHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(403)
 		io.WriteString(w, "forbidden")
 	}
-
 }
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(r.Body)
+	w.Write(body)
 	fmt.Println("body: ", string(body))
 }
 
