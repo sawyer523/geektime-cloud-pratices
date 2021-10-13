@@ -7,66 +7,62 @@ make build.docker
 # shellcheck disable=SC2084
  03> docker build -t httpserver .
 Sending build context to Docker daemon  23.91MB
-Step 1/13 : FROM golang:1.17.2-stretch AS builder
- ---> f4af25eac23b
+Step 1/13 : FROM golang:1.17.2-alpine3.14 AS builder
+ ---> 35cd8c8897b1
 Step 2/13 : WORKDIR /go/src
- ---> Running in f0fb39852a32
-Removing intermediate container f0fb39852a32
- ---> 30c9e2a2cb18
+ ---> Using cache
+ ---> 600559829a32
 Step 3/13 : COPY go.mod .
- ---> fb5cfc10ab9d
+ ---> Using cache
+ ---> f94f80ca6e7d
 Step 4/13 : COPY main.go .
- ---> 537b5d154148
+ ---> Using cache
+ ---> b7f10e7a8aba
 Step 5/13 : RUN go mod vendor
- ---> Running in 83686aeb3778
-go: downloading github.com/sirupsen/logrus v1.8.1
-go: downloading golang.org/x/sys v0.0.0-20191026070338-33540a1f6037
-Removing intermediate container 83686aeb3778
- ---> b3a5adb02dee
+ ---> Using cache
+ ---> 0b043abb0c39
 Step 6/13 : ENV CGO_ENABLED=0
- ---> Running in 9c85c8261dd5
-Removing intermediate container 9c85c8261dd5
- ---> 211823e6f9ef
+ ---> Using cache
+ ---> 3cb142bccd25
 Step 7/13 : RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /go/bin/httpserver main.go
- ---> Running in c16816c99f27
-Removing intermediate container c16816c99f27
- ---> 70913b96ac31
-Step 8/13 : FROM buildpack-deps:stretch-scm
- ---> dcbd17451a03
+ ---> Using cache
+ ---> 6dbddab8fbc5
+Step 8/13 : FROM alpine:3.14
+ ---> 14119a10abf4
 Step 9/13 : LABEL name="httpserver"
- ---> Running in 7f2ba23439a5
-Removing intermediate container 7f2ba23439a5
- ---> 4a9849d0113e
+ ---> Running in 7985545939fc
+Removing intermediate container 7985545939fc
+ ---> 01b054a9c8c8
 Step 10/13 : WORKDIR /opt/httpserver
- ---> Running in a882d264915b
-Removing intermediate container a882d264915b
- ---> f1a67ce0b28a
-Step 11/13 : COPY httpserver /opt/httpserver/
- ---> 2b5315c97c47
+ ---> Running in da015133e6a8
+Removing intermediate container da015133e6a8
+ ---> 8792a798160a
+Step 11/13 : COPY --from=builder /go/bin/httpserver /opt/httpserver/
+ ---> fa2e67417f25
 Step 12/13 : EXPOSE 8080
- ---> Running in 936b36df1259
-Removing intermediate container 936b36df1259
- ---> 3f2d5d1a644d
+ ---> Running in d1f84933b2e0
+Removing intermediate container d1f84933b2e0
+ ---> 24cdd313893d
 Step 13/13 : ENTRYPOINT  ["/opt/httpserver/httpserver"]
- ---> Running in 08f73bea3dca
-Removing intermediate container 08f73bea3dca
- ---> e3704d18d9f7
-Successfully built e3704d18d9f7
-Successfully tagged httpserver:latest
+ ---> Running in 952052f0b640
+Removing intermediate container 952052f0b640
+ ---> 013954043765
+Successfully built 013954043765
+Successfully tagged httpserver:v1.0.0.1
 ```
 运行容器
 ```shell
- docker run -dit httpserver:latest
+ docker run -dit httpserver:v1.0.0.1
 ```
 执行结果
 ```shell
-e56234aa054b4c5e23509bcc9f4973e701377440200dd77d3dd919851017bd1d
+203a430ca01f8e7e62c3bce18212aafd2a7a2649efb8466d0510b436ba74197d
 ```
 推送到docker仓库
 ```shell
 docker login
-docker tag httpserver:latest sawyer523/httpserver:latest
-docker push sawyer523/httpserver:latest
+docker tag httpserver:v1.0.0.1 sawyer523/httpserver:v1.0.0.1
+docker push sawyer523/httpserver:v1.0.0.1
 
 The push refers to repository [docker.io/sawyer523/httpserver]
 27a5bd1040d3: Pushed 
@@ -77,11 +73,11 @@ v1.0.0.4: digest: sha256:2bc4fe6669d18fb248172a2c5fdd526fa0b6de4351995676a72b55a
 
 进入容器
 ```shell
-03> docker inspect f608a6ae36ef
+03> docker inspect 203a430ca0
 [
     {
-        "Id": "f608a6ae36efdcaf9879c58120aa1dabe4f33e07e310170c438df4bf417f3072",
-        "Created": "2021-10-13T14:31:08.212410715Z",
+        "Id": "203a430ca01f8e7e62c3bce18212aafd2a7a2649efb8466d0510b436ba74197d",
+        "Created": "2021-10-13T15:06:51.289115506Z",
         "Path": "/opt/httpserver/httpserver",
         "Args": [],
         "State": {
@@ -91,18 +87,18 @@ v1.0.0.4: digest: sha256:2bc4fe6669d18fb248172a2c5fdd526fa0b6de4351995676a72b55a
             "Restarting": false,
             "OOMKilled": false,
             "Dead": false,
-            "Pid": 178935,
+            "Pid": 222842,
             "ExitCode": 0,
             "Error": "",
-            "StartedAt": "2021-10-13T14:31:08.529901697Z",
+            "StartedAt": "2021-10-13T15:06:51.623131044Z",
             "FinishedAt": "0001-01-01T00:00:00Z"
         },
-        "Image": "sha256:ecd18bfcca7a8bc87164737cd4f460f5041272ad8f488cbac061840672db6294",
-        "ResolvConfPath": "/var/lib/docker/containers/f608a6ae36efdcaf9879c58120aa1dabe4f33e07e310170c438df4bf417f3072/resolv.conf",
-        "HostnamePath": "/var/lib/docker/containers/f608a6ae36efdcaf9879c58120aa1dabe4f33e07e310170c438df4bf417f3072/hostname",
-        "HostsPath": "/var/lib/docker/containers/f608a6ae36efdcaf9879c58120aa1dabe4f33e07e310170c438df4bf417f3072/hosts",
-        "LogPath": "/var/lib/docker/containers/f608a6ae36efdcaf9879c58120aa1dabe4f33e07e310170c438df4bf417f3072/f608a6ae36efdcaf9879c58120aa1dabe4f33e07e310170c438df4bf417f3072-json.log",
-        "Name": "/hopeful_hawking",
+        "Image": "sha256:01395404376526c6af77cfeb67f33cc0188b397e0fac16239e066289e266d01b",
+        "ResolvConfPath": "/var/lib/docker/containers/203a430ca01f8e7e62c3bce18212aafd2a7a2649efb8466d0510b436ba74197d/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/203a430ca01f8e7e62c3bce18212aafd2a7a2649efb8466d0510b436ba74197d/hostname",
+        "HostsPath": "/var/lib/docker/containers/203a430ca01f8e7e62c3bce18212aafd2a7a2649efb8466d0510b436ba74197d/hosts",
+        "LogPath": "/var/lib/docker/containers/203a430ca01f8e7e62c3bce18212aafd2a7a2649efb8466d0510b436ba74197d/203a430ca01f8e7e62c3bce18212aafd2a7a2649efb8466d0510b436ba74197d-json.log",
+        "Name": "/sleepy_engelbart",
         "RestartCount": 0,
         "Driver": "overlay2",
         "Platform": "linux",
@@ -205,16 +201,16 @@ v1.0.0.4: digest: sha256:2bc4fe6669d18fb248172a2c5fdd526fa0b6de4351995676a72b55a
         },
         "GraphDriver": {
             "Data": {
-                "LowerDir": "/var/lib/docker/overlay2/b8ae49ebb8bbd09fb0439ed3febdf35d20d0cd5e09dbe33b92727e56c0483f3c-init/diff:/var/lib/docker/overlay2/b3e41b27207968249e3e39607466ec9232fe7ac71f5db0b9c0a81947976c9b60/diff:/var/lib/docker/overlay2/92e374e934845cb52874203f88f584820dba839802babf2dadd7f2e564961db3/diff:/var/lib/docker/overlay2/d14f5f19144cafa7fb179bc3a8bab465fac76891e231984f1a0c24c0f938b1f5/diff:/var/lib/docker/overlay2/4d29a63f9e06190b34b64cae4a338052a83ce81fa38e96e7980d8cdb6e2dc54b/diff:/var/lib/docker/overlay2/567cdcd4a4a631404dc2977307ba2137b1a4bc06f9eaf785d3927873e002513c/diff:/var/lib/docker/overlay2/13837b98278442c98d188f087df1dd9fbe60d007e686eb32d9ed1ba711e30216/diff",
-                "MergedDir": "/var/lib/docker/overlay2/b8ae49ebb8bbd09fb0439ed3febdf35d20d0cd5e09dbe33b92727e56c0483f3c/merged",
-                "UpperDir": "/var/lib/docker/overlay2/b8ae49ebb8bbd09fb0439ed3febdf35d20d0cd5e09dbe33b92727e56c0483f3c/diff",
-                "WorkDir": "/var/lib/docker/overlay2/b8ae49ebb8bbd09fb0439ed3febdf35d20d0cd5e09dbe33b92727e56c0483f3c/work"
+                "LowerDir": "/var/lib/docker/overlay2/947e4f5fcc40022fa25ccbe47d2b4a9791634343de01fdd31ed6857ca6e7b819-init/diff:/var/lib/docker/overlay2/0a725266a4bab4c3246b354f3036abba20b299e9bca2dcf96f0d4487960ded3d/diff:/var/lib/docker/overlay2/109077f5b6ae4059ed2b2f358802efeb448e0816d18f5a550d6db10e08308b52/diff:/var/lib/docker/overlay2/71c8433034e8557266ad95e8fc941a99f4039b4a94670b59e48e5f7e1e0cb3c5/diff",
+                "MergedDir": "/var/lib/docker/overlay2/947e4f5fcc40022fa25ccbe47d2b4a9791634343de01fdd31ed6857ca6e7b819/merged",
+                "UpperDir": "/var/lib/docker/overlay2/947e4f5fcc40022fa25ccbe47d2b4a9791634343de01fdd31ed6857ca6e7b819/diff",
+                "WorkDir": "/var/lib/docker/overlay2/947e4f5fcc40022fa25ccbe47d2b4a9791634343de01fdd31ed6857ca6e7b819/work"
             },
             "Name": "overlay2"
         },
         "Mounts": [],
         "Config": {
-            "Hostname": "f608a6ae36ef",
+            "Hostname": "203a430ca01f",
             "Domainname": "",
             "User": "",
             "AttachStdin": false,
@@ -243,17 +239,17 @@ v1.0.0.4: digest: sha256:2bc4fe6669d18fb248172a2c5fdd526fa0b6de4351995676a72b55a
         },
         "NetworkSettings": {
             "Bridge": "",
-            "SandboxID": "dc3a08cbde46419b9dd466be1851e14cdf4af7b181996950871e4c2df9c584c0",
+            "SandboxID": "648f376a6c8edf95c21656be01be773fac2a82db3049aa42ee023ee44395718d",
             "HairpinMode": false,
             "LinkLocalIPv6Address": "",
             "LinkLocalIPv6PrefixLen": 0,
             "Ports": {
                 "8080/tcp": null
             },
-            "SandboxKey": "/var/run/docker/netns/dc3a08cbde46",
+            "SandboxKey": "/var/run/docker/netns/648f376a6c8e",
             "SecondaryIPAddresses": null,
             "SecondaryIPv6Addresses": null,
-            "EndpointID": "09a1f20591b016b470d89c32614e2ca667fe9bafa630abbf4a08cc666c785e5f",
+            "EndpointID": "8d02f2ca1464fa81eee60ee682bc1036c16a1c1f1abb113ef3319ee043841fb4",
             "Gateway": "172.17.0.1",
             "GlobalIPv6Address": "",
             "GlobalIPv6PrefixLen": 0,
@@ -267,7 +263,7 @@ v1.0.0.4: digest: sha256:2bc4fe6669d18fb248172a2c5fdd526fa0b6de4351995676a72b55a
                     "Links": null,
                     "Aliases": null,
                     "NetworkID": "cacca2ae5c5f3ad35ab3d6a997e8412368d1126791971749d84b9ea742bd0c27",
-                    "EndpointID": "09a1f20591b016b470d89c32614e2ca667fe9bafa630abbf4a08cc666c785e5f",
+                    "EndpointID": "8d02f2ca1464fa81eee60ee682bc1036c16a1c1f1abb113ef3319ee043841fb4",
                     "Gateway": "172.17.0.1",
                     "IPAddress": "172.17.0.2",
                     "IPPrefixLen": 16,
@@ -282,7 +278,8 @@ v1.0.0.4: digest: sha256:2bc4fe6669d18fb248172a2c5fdd526fa0b6de4351995676a72b55a
     }
 ]
 
-root@k8s:~/go/src/geektime-cloud-pratices/03# nsenter --target 178935 --mount --uts --ipc --net --pid
-root@f608a6ae36ef:/# ls
-bin  boot  dev	etc  home  lib	lib64  media  mnt  opt	proc  root  run  sbin  srv  sys  tmp  usr  var
+203a430ca01f:~# cd /opt/httpserver/
+203a430ca01f:/opt/httpserver# ls
+httpserver
+203a430ca01f:/opt/httpserver#
 ```

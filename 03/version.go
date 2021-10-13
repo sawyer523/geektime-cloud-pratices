@@ -3,4 +3,4 @@ package main
 const MajorVersion = 1
 const MiddleVersion = 0
 const MinorVersion = 0
-const BuildNo = 1
+const BuildNo = 2
