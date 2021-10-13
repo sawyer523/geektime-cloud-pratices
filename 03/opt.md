@@ -278,8 +278,18 @@ v1.0.0.4: digest: sha256:2bc4fe6669d18fb248172a2c5fdd526fa0b6de4351995676a72b55a
     }
 ]
 
+root@k8s:/home/cxn# nsenter --target 240808 --mount --uts --ipc --net --pid su - root
 203a430ca01f:~# cd /opt/httpserver/
 203a430ca01f:/opt/httpserver# ls
 httpserver
 203a430ca01f:/opt/httpserver#
+203a430ca01f:/opt/httpserver# ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+94: eth0@if95: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1500 qdisc noqueue state UP
+    link/ether 02:42:ac:11:00:02 brd ff:ff:ff:ff:ff:ff
+    inet 172.17.0.2/16 brd 172.17.255.255 scope global eth0
+       valid_lft forever preferred_lft forever
 ```
