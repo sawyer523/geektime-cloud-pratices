@@ -278,6 +278,7 @@ v1.0.0.4: digest: sha256:2bc4fe6669d18fb248172a2c5fdd526fa0b6de4351995676a72b55a
     }
 ]
 
+03> chsh -s /bin/bash
 root@k8s:/home/cxn# nsenter --target 240808 --mount --uts --ipc --net --pid su - root
 203a430ca01f:~# cd /opt/httpserver/
 203a430ca01f:/opt/httpserver# ls
