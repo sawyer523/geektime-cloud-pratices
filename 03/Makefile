@@ -14,8 +14,9 @@ build.mac:
 
 .PHONY:	build.linux
 build.linux:
+	export CGO_ENABLED=0
 	@make build.version tmp=$(tmp)
-	@GOOS=linux GOARCH=$(arch) go build -o httpserver main.go
+	@GOOS=linux GOARCH=$(arch) go build -tags netgo -o httpserver main.go
 
 .PHONY: build.docker
 build.docker:
