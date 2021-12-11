@@ -19,7 +19,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/geektime-cloud-pratices/02/metrics"
+	"github.com/geektime-cloud-pratices/10/metrics"
 
 	"gopkg.in/yaml.v2"
 
@@ -47,10 +47,11 @@ func RootHandler(w http.ResponseWriter, r *http.Request, f func(http.ResponseWri
 	<-timer.C
 	f(w, r)
 	code := reflect.ValueOf(w).Elem().FieldByName("status")
+	fmt.Println(fmt.Sprint(code))
 	defer func() {
+		metric.ObserveTotal(fnName, r.Method)
+		metric.Count(fnName, r.Method, fmt.Sprint(code))
 		r.Body.Close()
-		metric.ObserveTotal(fnName)
-		metric.Count(fnName, code.String())
 	}()
 	logrus.Debug("ip: ", r.RemoteAddr, ", http code: ", code)
 }
@@ -59,13 +60,15 @@ func HealthHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		w.WriteHeader(403)
 		io.WriteString(w, "forbidden")
+		return
 	}
+	w.WriteHeader(http.StatusOK)
 }
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(r.Body)
 	w.Write(body)
-	fmt.Println("body: ", string(body))
+	w.WriteHeader(http.StatusOK)
 }
 
 type Bootstrap struct {
@@ -84,6 +87,7 @@ func init() {
 
 func main() {
 	flag.Parse()
+	metrics.Register()
 	logrus.Info("http starting")
 	os.Setenv("VERSION", "3")
 
@@ -95,7 +99,6 @@ func main() {
 		stop()
 	}()
 	flconf := path.Join(conf, "config")
-	fmt.Println(flconf)
 	go Watch(flconf, done)
 
 	bs, err := readConfig(flconf)

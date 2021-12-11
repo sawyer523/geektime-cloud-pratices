@@ -1,4 +1,4 @@
-module github.com/geektime-cloud-pratices/02
+module github.com/geektime-cloud-pratices/10
 
 go 1.17
 
