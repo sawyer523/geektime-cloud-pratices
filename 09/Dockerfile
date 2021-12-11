@@ -11,4 +11,4 @@ LABEL name="httpserver"
 COPY --from=builder /go/bin/httpserver .
 COPY config /opt
 EXPOSE 8080
-ENTRYPOINT  ["./httpserver"]
+CMD  ["./httpserver"]
