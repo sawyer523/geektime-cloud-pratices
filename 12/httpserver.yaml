@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpserver
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "80"
+      labels:
+        app: httpserver
+    spec:
+      containers:
+        - name: httpserver
+          imagePullPolicy: IfNotPresent
+          image: docker.io/sawyer523/httpserver:v1.2.0.15
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - mountPath: "/opt"
+              name: config
+      volumes:
+        - name: config
+          configMap:
+            name: httpserver-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: httpserver
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: httpserver

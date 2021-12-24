@@ -1,0 +1,45 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: httpsserver
+spec:
+  gateways:
+    - httpsserver
+  hosts:
+    - httpsserver.cxn.io
+  http:
+    - match:
+        - uri:
+            exact: "/healthz"
+      route:
+        - destination:
+            host: httpserver.securesvc.svc.cluster.local
+            port:
+              number: 80
+    - match:
+        - uri:
+            prefix: "/"
+      route:
+        - destination:
+            host: httpserver.securesvc.svc.cluster.local
+            port:
+              number: 80
+
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: httpsserver
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - hosts:
+        - httpsserver.cxn.io
+      port:
+        name: https-default
+        number: 443
+        protocol: HTTPS
+      tls:
+        mode: SIMPLE
+        credentialName: cxn-credential
